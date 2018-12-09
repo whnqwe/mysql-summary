@@ -22,10 +22,10 @@ update user_account set balance = balance +1000 where userID = 1;
 
 > begin / start transaction 			-- 手工
 >
-> 
+>
 > commit / rollback 				-- 事务提交或回滚
 >
-> 
+>
 > set session autocommit = on/off;	 -- 设定事务是否自动开启  
 
 
@@ -135,6 +135,7 @@ ROLLBACK;
 >  SQL92 ANSI/ISO标准：http://www.contrib.andrew.cmu.edu/~shadow/sql/sql1992.txt
 
 
+
 > 隔离级别的实现: 锁  MVCC
 
 #### Read Uncommitted（未提交读） --未解决并发问题
@@ -179,6 +180,7 @@ read）
 > 锁是用于管理不同事务对共享资源的并发访问
 
 
+
 > 支持行锁与表锁
 
 #### 表锁与行锁的区别
@@ -217,11 +219,13 @@ read）
 > 记录锁 Record Locks
 
 
-> 
+
+>
 > 间隙锁 Gap Locks
 
 
-> 
+
+>
 > 临键锁 Next-key Locks
 
 
@@ -290,7 +294,7 @@ select * from users where id =1;
 
 
 
-## 行锁到底锁了什么东西
+### 行锁到底锁了什么东西
 
 
 
@@ -300,13 +304,151 @@ select * from users where id =1;
 
 > 只有通过索引条件进行数据检索，InnoDB才使用行级锁，否则，InnoDB将使用表锁（锁住索引的所有记录）
 
+```mysql
+DROP TABLE IF EXISTS `users`;
+CREATE TABLE `users` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `name` varchar(255) DEFAULT NULL,
+  `phoneNum` varchar(255) DEFAULT NULL,
+  `lastUpdate` datetime DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `idx_name` (`name`) USING BTREE
+) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8;
+
+INSERT INTO `user` VALUES ('1', 'zhangsan', '1366666666', '2018-12-09 23:25:29');
+INSERT INTO `user` VALUES ('2', 'lisi', '1377777777', '2018-12-09 23:25:46');
+```
+
+
+
+#### 实例1
+
+```mysql
+-- transaction-1
+set session autocommit = OFF;
+update users set lastUpdate=NOW() where phoneNum = '13666666666';
+
+-- transaction-2
+update users set lastUpdate=NOW() where id =2; -- 加锁
+
+-- transaction-3
+update users set lastUpdate=NOW() where id =1; -- 加锁 
+```
+
+
+
+####  实例2
+
+```mysql
+-- transaction-1
+set session autocommit = OFF;
+update users set lastUpdate=NOW() where id = 1;
+
+-- transaction-2
+update users set lastUpdate=NOW() where id =2; -- 成功
+
+-- transaction-3
+update users set lastUpdate=NOW() where id =1; -- 加锁
+
+```
+
+
+
+####  实例3
+
+```mysql
+-- transaction-1
+set session autocommit = OFF;
+update users set lastUpdate=NOW() where `name` = 'zhangsan';
+
+
+-- transaction-2
+update users set lastUpdate=NOW() where `name` = 'zhangsan'; -- 加锁
+update users set lastUpdate=NOW() where id =1; --  加锁
+
+-- transaction-3
+update users set lastUpdate=NOW() where `name` = 'lisi'; -- 成功
+update users set lastUpdate=NOW() where id =2;-- 成功
+
+```
+
+
+
+## 意向共享锁(IS)  意向排它锁(IX)
+
+> 意向共享锁
+>
+> 表示事务准备给数据行加入共享锁，即一个数据行加共享锁前必须先取得该表的IS锁，意向共享锁之间是可以相互兼容的
 
 
 
 
 
+> 意向排它锁
+>
+> 表示事务准备给数据行加入排他锁，即一个数据行加排他锁前必须先取得该表的IX锁，意向排它锁之间是可以相互兼容的
 
 
+
+意向锁(IS 、IX) 是InnoDB 数据操作之前
+
+
+
+####   意义：
+
+当事务想去进行锁表时，可以先判断意向锁是否存在，存在时则可快速返回该表不能启用表锁
+
+
+
+```mysql
+-- transaction-1
+set session autocommit = OFF;
+update users set lastUpdate=NOW() where id = 1;
+
+-- transaction-2
+update users set lastUpdate=NOW() where phoneNum = '13777777777';
+```
+
+
+
+##  自增锁
+
+>  针对自增列自增长的一个特殊的表级别锁
+
+
+>  show variables like 'innodb_autoinc_lock_mode';
+
+
+>  默认取值1 ，代表连续，事务未提交ID
+
+
+
+#### 实例
+
+> 现在数据库中的ID最大值为2，在进行三次ROLLBACK操作后再进行insert操作,表中记录最大ID为
+
+
+
+```mysql
+
+begin;
+insert into users(name , phoneNum ,lastUpdate ) values ('mysql-1','1344444444',now());
+ROLLBACK;
+
+begin;
+insert into users(name , phoneNum ,lastUpdate ) values ('mysql-2','1344444445',now());
+ROLLBACK;
+
+begin;
+insert into users(name , phoneNum ,lastUpdate ) values ('mysql-3','1344444446',now());
+ROLLBACK;
+
+
+begin;
+insert into users(name , phoneNum ,lastUpdate ) values ('mysql-4','1344444447',now());
+COMMIT;
+
+```
 
 
 
