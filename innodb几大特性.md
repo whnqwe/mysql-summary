@@ -221,12 +221,12 @@ read）
 
 
 >
-> 间隙锁 Gap Locks
+>间隙锁 Gap Locks
 
 
 
 >
-> 临键锁 Next-key Locks
+>临键锁 Next-key Locks
 
 
 
@@ -416,16 +416,18 @@ update users set lastUpdate=NOW() where phoneNum = '13777777777';
 >  针对自增列自增长的一个特殊的表级别锁
 
 
+
 >  show variables like 'innodb_autoinc_lock_mode';
 
 
->  默认取值1 ，代表连续，事务未提交ID
+
+>  默认取值1 ，代表连续，事务未提交ID永久丢失
 
 
 
 #### 实例
 
-> 现在数据库中的ID最大值为2，在进行三次ROLLBACK操作后再进行insert操作,表中记录最大ID为
+> 现在数据库中的ID最大值为2，在进行三次ROLLBACK操作后再进行insert操作,表中记录最大ID为6
 
 
 
@@ -447,14 +449,127 @@ ROLLBACK;
 begin;
 insert into users(name , phoneNum ,lastUpdate ) values ('mysql-4','1344444447',now());
 COMMIT;
-
 ```
 
 
 
+## 临键锁
+
+>  Next-key locks:锁住记录+ 区间（左开右闭),当sql执行按照索引进行数据的检索时,查询条件为范围查找（between and、<、>等）并有数据命中则此时SQL语句加上的锁为Next-key locks， 锁住索引的记录+区间（左开右闭）
 
 
 
+> InnoDB 的默认行锁算法
+
+#### 实例
+
+```mysql
+CREATE TABLE `t2` (
+  `id` int(11) NOT NULL,
+  `name` varchar(255) DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+INSERT INTO `t2` VALUES ('1', '1');
+INSERT INTO `t2` VALUES ('4', '4');
+INSERT INTO `t2` VALUES ('7', '7');
+INSERT INTO `t2` VALUES ('10', '10');
+```
+
+
+
+```mysql
+-- transaction-1
+begin;
+select * from t2 where id>5 and id<9 for update;
+
+-- transaction-2
+set session autocommit=off;
+select * from t2 where id=4 for update;  -- 未加锁
+select * from t2 where id=7 for update; -- 未加锁
+select * from t2 where id=10 for update; -- 未加锁
+INSERT INTO `t2` (`id`, `name`) VALUES (9, '9'); -- 未加锁
+```
+
+
+
+![](assert/next-key.jpg)
+
+
+
+
+
+
+
+## 间隙锁
+
+> Gap locks:锁住数据不存在的区间（左开右开）,当sql执行按照索引进行数据的检索时，查询条件的数据不存在，这时SQL语句加上的锁即为Gap locks， 锁住索引不存在的区间（左开右开）
+
+
+
+```mysql
+-- transaction-1
+begin;
+select * from t2 where id >4 and id <6 for update;
+-- 或者
+select * from t2 where id =6 for update;
+
+-- transaction-2
+INSERT INTO `t2` (`id`, `name`) VALUES (5, '5');
+INSERT INTO `t2` (`id`, `name`) VALUES (6, '6');
+```
+
+
+
+![](assert/gap-lock.jpg)
+
+
+
+## 记录锁
+
+> 锁住具体的索引项
+> 当sql执行按照唯一性（Primary key、Unique key）索引进行数据的检索时，查询条件等值匹
+> 配且查询的数据是存在，这时SQL语句加上的锁即为记录锁Record locks， 锁住具体的索引项
+
+
+
+```mysql
+-- transaction-1
+begin;
+select * from t2 where id =4 for update;
+
+-- transaction-2 
+select * from t2 where id =7 for update;
+select * from t2 where id =4 for update;
+```
+
+
+
+![](assert/record-lock.jpg)
+
+
+
+
+
+
+
+##  锁解决脏读
+
+![](assert/jiejuezangdu.jpg)
+
+
+
+
+
+## 锁解决不可重复读
+
+![](assert/jiejuebukechongfudu.jpg)
+
+## 锁解决幻读
+
+![](assert/jiejuehuandu.jpg)
+
+  
 
 #  MVCC
 
