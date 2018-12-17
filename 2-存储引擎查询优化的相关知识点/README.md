@@ -386,10 +386,9 @@
 
 > id不同，如果是子查询，id的序号会递增，id值越大优先级越高，越先被执行
 
-id相同又不同即两种情况同时存在，id如果相同，可以认为是一组，从上往下顺序
-执行；在所有组中，id值越大，优先级越高，越先执行
+##### id为空
 
-
+> select_type = UNION RESULT   最后执行
 
 
 
@@ -405,13 +404,13 @@ id相同又不同即两种情况同时存在，id如果相同，可以认为是�
 
 > PRIMARY：查询中包含子部分，最外层查询则被标记为primary
 
-###### SUBQUERY/MATERIALIZED
+###### SUBQUERY
 
-> SUBQUERY/MATERIALIZED：SUBQUERY表示在select 或 where列表中包含了子查询
+> SUBQUERY：在select 或 where列表中包含了子查询
 
 ###### MATERIALIZED
 
-> MATERIALIZED表示where 后面in条件的子查询
+> MATERIALIZED: where 后面in条件的子查询
 
 ###### UNION
 
