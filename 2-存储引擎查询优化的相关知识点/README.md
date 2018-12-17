@@ -370,6 +370,154 @@
 
    > 先进性排序，再采用二分查找的方式
 
+
+
+#### 执行计划
+
+##### 执行计划-id
+
+>  select 查询的序列号，标识执行的顺序
+
+###### id相同
+
+> id相同, 执行顺序由上至下
+
+###### id不同
+
+> id不同，如果是子查询，id的序号会递增，id值越大优先级越高，越先被执行
+
+id相同又不同即两种情况同时存在，id如果相同，可以认为是一组，从上往下顺序
+执行；在所有组中，id值越大，优先级越高，越先执行
+
+
+
+
+
+##### 执行计划-select_type
+
+> 查询的类型，主要是用于区分普通查询、联合查询、子查询等
+
+###### SIMPLE
+
+> SIMPLE：简单的select查询，查询中不包含子查询或者union
+
+###### PRIMARY
+
+> PRIMARY：查询中包含子部分，最外层查询则被标记为primary
+
+###### SUBQUERY/MATERIALIZED
+
+> SUBQUERY/MATERIALIZED：SUBQUERY表示在select 或 where列表中包含了子查询
+
+###### MATERIALIZED
+
+> MATERIALIZED表示where 后面in条件的子查询
+
+###### UNION
+
+> UNION：若第二个select出现在union之后，则被标记为union
+
+###### UNION RESULT
+
+> UNION RESULT：从union表获取结果的select
+
+
+
+##### 执行计划-table
+
+> 查询涉及到的表
+>
+> 直接显示表名或者表的别名
+
+###### unionM    N
+
+> <unionM,N> 由ID为M,N 查询union产生的结果
+
+###### subquery   N
+
+> <subqueryN> 由ID为N查询生产的结果
+
+
+
+##### 执行计划-type
+
+> 访问类型，sql 查询优化中一个很重要的指标，结果值从好到坏依次是：
+> system > const > eq_ref > ref > range > index > ALL
+
+###### system
+
+> system：表只有一行记录（等于系统表），const类型的特例，基本不会出现，可以忽略不计
+
+###### const
+
+> const：表示通过索引一次就找到了，const用于比较primary key 或者 unique索引
+
+###### eq_ref
+
+> eq_ref：唯一索引扫描，对于每个索引键，表中只有一条记录与之匹配。常见于主键 或 唯一索引扫描
+
+###### ref
+
+> ref：非唯一性索引扫描，返回匹配某个单独值的所有行，本质是也是一种索引访问
+
+###### range
+
+> range：只检索给定范围的行，使用一个索引来选择行
+
+###### index
+
+> index：Full Index Scan，索引全表扫描，把索引从头到尾扫一遍
+
+###### ALL
+
+> ALL：Full Table Scan，遍历全表以找到匹配的行
+
+
+
+##### 执行计划-possible_keys | key | rows | filtered
+
+###### possible_keys
+
+> 查询过程中有可能用到的索引
+
+###### key
+
+> 实际使用的索引，如果为 NULL ，则没有使用索引
+
+###### rows
+
+> 根据表统计信息或者索引选用情况，大致估算出找到所需的记录所需要读取的行
+> 数
+
+###### filtered
+
+> 它指返回结果的行占需要读到的行 (rows 列的值) ) 的百分比
+>
+> 表示返回结果的行数占需读取行数的百分比， filtered
+
+
+
+
+
+##### 执行计划-Extra
+
+###### 	Using filesort 
+> mysql 对数据使用一个外部的文件内容进行了排序，而不是按照表内的索引进行排序读取
+
+###### 	Using temporary
+> 使用临时表保存中间结果，也就是说mysql 在对查询结果排序时使用了临时表，常见于order by  或 group by
+
+###### 	Using index
+> 表示相应的select 操作中使用了覆盖索引（Covering Index ），避免了访问表的数据行，效率高
+
+###### 	Using where
+> 使用了where 过滤条件
+
+###### 	select tables optimized away
+
+> 基于索引优化MIN/MAX 操作或者MyISAM 存储引擎优化COUNT(*) 操作，不必等到执行阶段在进行计算，查询执行
+> 计划生成的阶段即可完成优化
+
 ### 查询执行引擎
 
 > 调用插件式的存储引擎的原子 API 的功能进行执行计划的执行
@@ -386,3 +534,8 @@
 >   > >
 >   > > 坏处： 浪费内存
 >   > >
+
+
+
+# 定位慢SQL
+
