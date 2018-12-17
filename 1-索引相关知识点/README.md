@@ -15,8 +15,22 @@
 ## 索引的作用
 
 > 1. 索引能极大的减少 存储引擎需要扫描的数据 量
+>
 > 2. 索引可以把随机IO 变成顺序IO
+>
 > 3. 索引 可以帮助 我们在进行 分组、 排序等操作时，避免 使用临时 表
+>
+>    > select * from users where id asc   
+>    >
+>    > > id主键
+>    > >
+>    > > extra 为空
+>    >
+>    > select * from user where lastUpdate desc 
+>    >
+>    > > lastUpdate 没有索引
+>    > >
+>    > > extra: Using filesort
 
 ##  常见数据结构的对比
 
