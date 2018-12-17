@@ -610,6 +610,7 @@ set global long_query_time = 0.1(秒)
 ## 慢查询分析工具
 
 ```mysql
+mysqldumpslow --help
 mysqldumpslow -t 10 -s at /var/lib/mysql/slow.log
 ```
 
