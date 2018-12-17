@@ -253,9 +253,13 @@
 
 > - 值： 1 -–  启用查询缓存，只要符合查询缓存的要求，客户端的查询语句和记录集
 >   都可以缓存起来，供其他客户端使用 ，加上 SQL_NO_CACHE 将不缓存
+>
+> > select SQL_NO_CACHE  *  from user where id=1
 
 > - 值： 2 -–  启用查询缓存，只要查询语句中添加了参数： SQL_CACHE ，且符合查询
 >   缓存的要求，客户端的查询语句和记录集，则可以缓存起来，供其他客户端使用
+>
+> > select SQL_CACHE  *  from user where id=1
 
 ##### query_cache_size
 > 针对 所有的查询语句
