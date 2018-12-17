@@ -1,4 +1,4 @@
-#  插拔式的存储引擎
+插拔式的存储引擎
 
 
 
@@ -520,15 +520,13 @@
 
 ### 返回客户端
 
-> -  有需要做缓存的，执行缓存操作
+> - 有需要做缓存的，执行缓存操作
 >
 > - 增量的返回结果：
 >
 >   > 开始生成第一条结果时 ,mysql  就开始往请求方逐步返回数据
 >   >
 >   > > 好处：  mysql 服务器无须保存过多的数据 ，用户体验好，马上就拿到了数据 
->   > >
->   > > 坏处： 浪费内存
 >   > >
 
 
@@ -537,3 +535,85 @@
 
 # 定位慢SQL
 
+## 慢查询日志
+
+#### 查看慢查询日志是否开启
+
+```mysql
+show variables like 'slow_query_log'
+```
+
+#### 开启慢查询日志
+
+```mysql
+set  global slow_query_log = on
+```
+
+#### 设置慢查询日志的存放位置
+
+```mysql
+set global  slow_query_log_file = '/var/lib/mysql/gupaoedu-slow.log'
+```
+
+#### 没有使用索引的SQL是否加入慢查询日志
+
+```mysql
+set global log_queries_not_using_indexes = on
+```
+
+#### SQL查询超过多少时间加入慢查询日志
+
+```MYSQL
+set global long_query_time = 0.1(秒)
+```
+
+
+
+## 慢查询日志分析
+
+![1545061622898](assert/manchaxun.jpg)
+
+#### Time
+
+> 日志记录的时间
+
+#### User@Host 
+
+> 执行的用户及主机
+
+#### Query_time
+
+>  查询耗费时间
+
+##### Lock_time
+
+>   锁表时间
+
+##### Rows_sent  
+
+> 发送给请求方的记录条数 
+
+##### Rows_examined 
+
+> 语句扫描的记录条数
+
+##### SET timestamp
+
+> 语句执行的时间点
+
+#### select .... 
+
+> 执行的具体语句
+
+
+
+## 慢查询分析工具
+
+```mysql
+mysqldumpslow -t 10 -s at /var/lib/mysql/slow.log
+```
+
+#### 其他工具
+
+- mysqlsla
+- pt-query-digest
