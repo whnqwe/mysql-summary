@@ -18,7 +18,7 @@
 
 
 
-## 登录到mysql
+#### 登录到mysql
 
 
 
@@ -28,7 +28,7 @@
 
 
 
-## 操作
+#### 操作
 
 - 默认的随机密码是没办法直接对数据库做操作的，需要修改密码，然后，5.7版本用了validate_password密码加强插件，因此在修改密码的时候绝对不是 123456 能糊弄过去的。需要严格按照规范去设置密码
 
@@ -46,12 +46,19 @@
 
 
 
-## 赋权操作
+#### 赋权操作
 
 > 默认情况下其他服务器的客户端不能直接访问mysql服务端，需要对ip授权
 
+```mysql
+mysql>GRANT ALL PRIVILEGES ON *.*  TO 'root'@'%' IDENTIFIED BY 'root' WITH GRANT OPTION;
+mysql>flush privilege
+```
 
-> GRANT ALL PRIVILEGES ON *.*  TO 'root'@'%' IDENTIFIED BY 'root' WITH GRANT OPTION;
+```mysql
+-- 给来自10.163.225.87的用户joe分配可对数据库vtdc所有表进行所有操作的权限，并设定口令为123
+mysql>grant  all  privileges  on  vtdc.*  to  joe@'10.163.255.87'  identified  by  '123';
+```
 
 
 

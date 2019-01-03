@@ -1,5 +1,7 @@
 # mysql-summary
 
+> 数据结构演示
+>
 > https://www.cs.usfca.edu/~galles/visualization/Algorithms.html 
 
 
@@ -126,9 +128,11 @@
 
 ### myisam
 
-###  ![微信图片编辑_20181208042710](image/微信图片编辑_20181208042710.jpg)
+![微信图片编辑_20181208042710](image/微信图片编辑_20181208042710.jpg)
 
  ![微信图片编辑_20181208042745](image/微信图片编辑_20181208042745.jpg)
+
+
 
 
 
