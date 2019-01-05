@@ -96,11 +96,10 @@ ROLLBACK;
 > 隔离性（Isolation）
 > 一个事务所操作的数据在提交之前，对其他事务的可见性设定（一般设定为不可见）
 >
->
 > 持久性（Durability）
 > 事务所做的修改就会永久保存，不会因为系统意外导致数据的丢失
 >
-> 
+>
 
 
 
@@ -214,18 +213,11 @@ read）
 >
 > 自增锁：AUTO-INC Locks
 >
-> 
-
-#### innodb行锁的算法
 
 > 记录锁 Record Locks
 
-
-
 >
 >间隙锁 Gap Locks
-
-
 
 >
 >临键锁 Next-key Locks
@@ -591,16 +583,6 @@ select * from t2 where id =4 for update;
 - 为表添加合理的索引。可以看到如果不走索引将会为表的每一行记录添
 
 加上锁（或者说是表锁）
-
-
-
-
-
-
-
-
-
-#  MVCC
 
 
 
