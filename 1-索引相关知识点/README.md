@@ -22,17 +22,17 @@
 >
 > 3. 索引 可以帮助 我们在进行 分组、 排序等操作时，避免 使用临时 表
 >
->    > select * from users where id asc   
->    >
->    > > id主键
->    > >
->    > > extra 为空
->    >
->    > select * from user where lastUpdate desc 
->    >
->    > > lastUpdate 没有索引
->    > >
->    > > extra: Using filesort
+> > select * from users where id asc   
+> >
+> > > id主键
+> > >
+> > > extra 为空
+> >
+> > select * from user where lastUpdate desc 
+> >
+> > > lastUpdate 没有索引
+> > >
+> > > extra: Using filesort
 
 ##  常见数据结构的对比
 
@@ -72,7 +72,7 @@
 >
 > (3)
 
-
+ 
 
 ### 多路平衡查找树 （B-tree）
 
@@ -108,15 +108,15 @@
 
 - B+ 树的磁盘读写能力更 强
 
-  > 每页存放的数据更好
+  > 每页存放的数据更多
 
-- B+树 树 的排序能力更强
+- B+树 的排序能力更强
 
   > B+tree 叶子节点是顺序排序的的
 
 - B+ 树的查询效率更加 稳定
 
-  > 每次查询数据的时间，几乎相同
+  > 每次查询数据的时间几乎相同
 
 
 
