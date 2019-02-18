@@ -420,6 +420,8 @@ update users set lastUpdate=NOW() where phoneNum = '13777777777';
 
 
 > select auto_increment from information_schema.`TABLES` where table_name=tableName and TABLE_SCHEMA=baseName
+>
+> 
 
 #### 实例
 
