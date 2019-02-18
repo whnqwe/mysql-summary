@@ -419,6 +419,8 @@ update users set lastUpdate=NOW() where phoneNum = '13777777777';
 
 
 
+> select auto_increment from information_schema.`TABLES` where table_name=tableName and TABLE_SCHEMA=baseName
+
 #### 实例
 
 > 现在数据库中的ID最大值为2，在进行三次ROLLBACK操作后再进行insert操作,表中记录最大ID为6
